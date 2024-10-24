@@ -88,8 +88,12 @@ fn main() {
         });
 
     match args.subcommand {
-        cli_args::Subcommand::Info => commands::print_info(&payload),
-        cli_args::Subcommand::Extract => commands::extract_tokens(&payload),
+        cli_args::Subcommand::Info => {
+            commands::print_info(&payload).expect("Failed to write to stdout");
+        }
+        cli_args::Subcommand::Extract => {
+            commands::extract_tokens(&payload).expect("Failed to write to stdout");
+        }
         cli_args::Subcommand::Export(export_args) => {
             commands::export_tokens(&payload, &export_args).unwrap_or_else(|e| {
                 print_error_and_exit(q, &format!("Failed to export data: {e}"))

@@ -1,34 +1,67 @@
-use crate::{authenticator_export::MigrationPayload, cli_args};
-use std::fmt::Write;
+use base64::Engine;
 
-pub fn print_info(payload: &MigrationPayload) {
-    let contains_accounts = payload
-        .otp_parameters
-        .iter()
-        .fold(String::new(), |mut curr, param| {
-            writeln!(curr, "        {}", param.name).unwrap();
-            curr
-        });
+use crate::{
+    authenticator_export::{migration_payload::OtpType, MigrationPayload},
+    cli_args,
+};
+use std::io::Write;
 
-    println!(
-        concat!(
-            "Detected migration payload:\n",
-            "   version: {}\n",
-            "   batch_size: {}\n",
-            "   batch_index: {}\n",
-            "   batch_id: {}\n",
-            "   contained accounts:\n{}"
-        ),
-        payload.version,
-        payload.batch_size,
-        payload.batch_index,
-        payload.batch_id,
-        contains_accounts.trim_end()
-    );
+pub fn print_info(payload: &MigrationPayload) -> std::io::Result<()> {
+    let mut stdout = std::io::stdout().lock();
+
+    writeln!(stdout, "Migration payload:")?;
+    writeln!(stdout, "    Version: {}", payload.version)?;
+    writeln!(stdout, "    Batch size: {}", payload.batch_size)?;
+    writeln!(stdout, "    Batch index: {}", payload.batch_index)?;
+    writeln!(stdout, "    Batch ID: {}", payload.batch_id)?;
+
+    writeln!(
+        stdout,
+        "    Contained accounts ({}):",
+        payload.otp_parameters.len()
+    )?;
+    for param in &payload.otp_parameters {
+        writeln!(stdout, "    {}", param.name)?;
+    }
+
+    Ok(())
 }
 
-pub fn extract_tokens(payload: &MigrationPayload) {
-    todo!()
+pub fn extract_tokens(payload: &MigrationPayload) -> std::io::Result<()> {
+    let mut stdout = std::io::stdout().lock();
+
+    for params in &payload.otp_parameters {
+        writeln!(stdout, "{}:", params.name)?;
+        writeln!(stdout, "    Issuer: {}", params.issuer)?;
+        writeln!(
+            stdout,
+            "    Algorithm: {}",
+            params.algorithm().as_str_name()
+        )?;
+        writeln!(stdout, "    Type: {}", params.r#type().as_str_name())?;
+
+        let digits = match params.digits() {
+            crate::authenticator_export::migration_payload::DigitCount::Unspecified => "N/A",
+            crate::authenticator_export::migration_payload::DigitCount::Six => "6",
+            crate::authenticator_export::migration_payload::DigitCount::Eight => "8",
+        };
+
+        writeln!(stdout, "    Digits: {digits}")?;
+
+        writeln!(
+            stdout,
+            "    Secret: {}",
+            base64::prelude::BASE64_STANDARD.encode(&params.secret)
+        )?;
+
+        if params.r#type() == OtpType::Hotp {
+            writeln!(stdout, "    Counter: {}", params.counter)?;
+        }
+
+        writeln!(stdout)?;
+    }
+
+    Ok(())
 }
 
 #[derive(thiserror::Error, Debug)]
