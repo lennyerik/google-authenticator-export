@@ -20,7 +20,11 @@ jobs:
             repo-token: ${{ secrets.GITHUB_TOKEN }}
         - name: Build
           run: cargo build
+        - name: Run tests
+          run: cargo test
         - name: Clippy
           run: cargo clippy -- -Dwarnings -W clippy::pedantic -W clippy::nursery
+        - name: Clippy tests
+          run: cargo clippy --tests -- -Dwarnings -W clippy::pedantic -W clippy::nursery
         - name: Formatting
           run: cargo fmt --check
