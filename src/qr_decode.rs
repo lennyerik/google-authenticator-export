@@ -25,7 +25,6 @@ pub fn decode_to_string(img: &image::GrayImage) -> Result<String, Error> {
     }
 
     let data = code.decode().map_err(|_| Error::DecodingFailed)?;
-    dbg!(&data.payload);
     String::from_utf8(data.payload).map_err(|_| Error::DataNotASCII)
 }
 
