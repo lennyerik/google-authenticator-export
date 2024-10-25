@@ -68,7 +68,7 @@ pub fn print_info(payload: &MigrationPayload) -> std::io::Result<()> {
         payload.otp_parameters.len()
     )?;
     for param in &payload.otp_parameters {
-        writeln!(stdout, "    {}", param.name)?;
+        writeln!(stdout, "        {}", param.name)?;
     }
 
     Ok(())

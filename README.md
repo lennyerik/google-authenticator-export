@@ -25,6 +25,58 @@ in order to get a human-readable list of all the tokens.
 > [!TIP]
 > If you do not have a picture of an exported QR handy, feel free to try the commands with `src/test/img/demo_export.png`
 
+### Example Output
+```
+$ google-authenticator-export demo_export.png info
+
+Migration payload:
+Version: 2
+Batch size: 1
+Batch index: 0
+Batch ID: 0
+Contained accounts (4):
+    testuser
+    test-github.user@example.com
+    anothertestuser
+    fourthuser
+```
+
+```
+$ google-authenticator-export demo_export.png extract
+
+testuser:
+    Issuer: example.com
+    Algorithm: ALGORITHM_SHA1
+    Type: OTP_TYPE_TOTP
+    Digits: 6
+    Secret (Base32): JBSWY3DPEHPK3PXP
+    OTP URL: otpauth://totp/testuser?issuer=example.com&secret=JBSWY3DPEHPK3PXP&digits=6&algorithm=SHA1
+
+test-github.user@example.com:
+    Issuer: github.com
+    Algorithm: ALGORITHM_SHA1
+    Type: OTP_TYPE_TOTP
+    Digits: 6
+    Secret (Base32): K5XXE3DEEEQCAIBA
+    OTP URL: otpauth://totp/test-github.user%40example.com?issuer=github.com&secret=K5XXE3DEEEQCAIBA&digits=6&algorithm=SHA1
+
+anothertestuser:
+    Issuer: someexampleservice
+    Algorithm: ALGORITHM_SHA1
+    Type: OTP_TYPE_TOTP
+    Digits: 6
+    Secret (Base32): K5XXE3DEEEQCAIBB
+    OTP URL: otpauth://totp/anothertestuser?issuer=someexampleservice&secret=K5XXE3DEEEQCAIBB&digits=6&algorithm=SHA1
+
+fourthuser:
+    Issuer: someexampleservice
+    Algorithm: ALGORITHM_SHA1
+    Type: OTP_TYPE_TOTP
+    Digits: 6
+    Secret (Base32): K5XXE3DEEEQCAIBC
+    OTP URL: otpauth://totp/fourthuser?issuer=someexampleservice&secret=K5XXE3DEEEQCAIBC&digits=6&algorithm=SHA1
+```
+
 ## Exporting
 
 If you have a *lot* of OTP codes and prefer automating the workflow of importing them into your new application of choice, consider the `export` subcommand instead.
