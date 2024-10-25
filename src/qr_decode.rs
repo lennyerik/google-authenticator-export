@@ -1,4 +1,4 @@
-#[derive(thiserror::Error, Debug, PartialEq, Eq)]
+#[derive(thiserror::Error, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Error {
     #[error("no QR code found")]
     NoQRCodeFound,

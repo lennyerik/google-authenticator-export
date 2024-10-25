@@ -1,4 +1,3 @@
-use base64::Engine;
 use clap::Parser;
 use prost::Message;
 
@@ -68,8 +67,8 @@ fn main() {
         )
     });
 
-    let binary_data = base64::prelude::BASE64_STANDARD
-        .decode(url_decoded_data.as_ref())
+    let binary_data = data_encoding::BASE64
+        .decode(url_decoded_data.as_bytes())
         .unwrap_or_else(|e| {
             print_error_and_exit(
                 q,
