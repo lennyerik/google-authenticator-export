@@ -17,6 +17,9 @@ urlencoding = "2.1.3"
 [build-dependencies]
 prost-build = "0.13.3"
 
+[profile.dev]
+opt-level = 1
+
 [profile.release]
 strip = true
-# lto = true
+lto = true

@@ -22,6 +22,9 @@ to see what accounts are contained in the QR code and then run
 
 in order to get a human-readable list of all the tokens.
 
+> [!TIP]
+> If you do not have a picture of an exported QR handy, feel free to try the commands with `src/test/img/demo_export.png`
+
 ## Exporting
 
 If you have a *lot* of OTP codes and prefer automating the workflow of importing them into your new application of choice, consider the `export` subcommand instead.

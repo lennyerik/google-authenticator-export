@@ -1,9 +1,4 @@
 use clap::Parser;
-use prost::Message;
-
-const QR_PREFIX: &str = "otpauth-migration://offline?data=";
-const INVALID_DATA_MSG: &str =
-    "Are you sure the QR code is a valid Google Authenticator App export code?";
 
 mod authenticator_export {
     #![allow(clippy::all)]
@@ -49,42 +44,18 @@ fn main() {
     let qr_data = qr_decode::decode_to_string(&img.into())
         .unwrap_or_else(|e| print_error_and_exit(q, &format!("Failed to decode QR code: {e}")));
 
-    let url_data = qr_data
-        .strip_prefix("otpauth-migration://offline?data=")
-        .unwrap_or_else(|| {
-            print_error_and_exit(
-                q,
-                &format!("Failed to find {QR_PREFIX} URL in QR code.\n{INVALID_DATA_MSG}"),
-            )
-        });
-
-    let url_decoded_data = urlencoding::decode(url_data).unwrap_or_else(|_| {
+    let payload = qr_decode::parse_qr_payload(&qr_data).unwrap_or_else(|e| {
         print_error_and_exit(
             q,
             &format!(
-            "Migration payload URL data contained encoded non-UTF8 characters\n{INVALID_DATA_MSG}"
-        ),
+                concat!(
+                    "Parsing error: {}\n",
+                    "Are you sure the QR code is a valid Google Authenticator App export code?"
+                ),
+                e
+            ),
         )
     });
-
-    let binary_data = data_encoding::BASE64
-        .decode(url_decoded_data.as_bytes())
-        .unwrap_or_else(|e| {
-            print_error_and_exit(
-                q,
-                &format!(
-                    "Failed to parse migration payload data as base64: {e}\n{INVALID_DATA_MSG}"
-                ),
-            )
-        });
-
-    let payload = authenticator_export::MigrationPayload::decode(binary_data.as_slice())
-        .unwrap_or_else(|e| {
-            print_error_and_exit(
-                q,
-                &format!("Failed to decode binary QR code data: {e}\n{INVALID_DATA_MSG}"),
-            )
-        });
 
     match args.subcommand {
         cli_args::Subcommand::Info => {
